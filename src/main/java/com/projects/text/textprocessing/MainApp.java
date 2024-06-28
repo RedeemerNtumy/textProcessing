@@ -173,14 +173,6 @@ public class MainApp extends Application {
     }
 
 
-
-    private void showAlertWithTextFlow(String title, String header, TextFlow content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
-        alert.getDialogPane().setContent(content);
-        alert.showAndWait();
-    }
     private void showAlertWithTextFlow(String title, String header, TextFlow originalFlow, TextFlow newFlow) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
