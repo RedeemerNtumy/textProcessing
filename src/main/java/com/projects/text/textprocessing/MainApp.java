@@ -161,7 +161,6 @@ public class MainApp extends Application {
         while (matcher.find()) {
             Text priorText = new Text(content.substring(lastEnd, matcher.start()));
             Text matchedText = new Text(content.substring(matcher.start(), matcher.end()));
-//            matchedText.setStyle("-fx-font-weight: bold; -fx-fill: green;");
             textFlow.getChildren().addAll(priorText, matchedText);
             lastEnd = matcher.end();
         }
