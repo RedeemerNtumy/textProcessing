@@ -82,6 +82,7 @@ public class MainApp extends Application {
         }
     }
 
+
     private void onSearch() {
         Item selectedItem = tableView.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
@@ -105,23 +106,21 @@ public class MainApp extends Application {
         Pattern pattern = Pattern.compile(patternText);
         Matcher matcher = pattern.matcher(content);
 
-        if (matcher.find()) {
-            TextFlow textFlow = new TextFlow();
-            int lastEnd = 0;
-            do {
-                Text priorText = new Text(content.substring(lastEnd, matcher.start()));
-                Text matchedText = new Text(content.substring(matcher.start(), matcher.end()));
-                matchedText.setStyle("-fx-font-weight: bold; -fx-fill: red;");
-                textFlow.getChildren().addAll(priorText, matchedText);
-                lastEnd = matcher.end();
-            } while (matcher.find());
+        StringBuilder resultMessage = new StringBuilder();
+        boolean found = false;
 
-            textFlow.getChildren().add(new Text(content.substring(lastEnd)));
-            showAlertWithTextFlow("Search Result", "The match is highlighted in the text below", textFlow);
+        while (matcher.find()) {
+            found = true;
+            resultMessage.append("Found '").append(matcher.group()).append("' at position ").append(matcher.start()).append("\n");
+        }
+
+        if (found) {
+            showAlert("Search Result", "Found matches:\n" + resultMessage.toString());
         } else {
             showAlert("Search Result", "No matches found");
         }
     }
+
     private void onReplace() {
         Item selectedItem = tableView.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
@@ -156,18 +155,23 @@ public class MainApp extends Application {
     private TextFlow highlightText(String content, String searchQuery) {
         TextFlow textFlow = new TextFlow();
         int lastEnd = 0;
-        Pattern pattern = Pattern.compile(Pattern.quote(searchQuery));
+        // Compile the pattern to be case-insensitive
+        Pattern pattern = Pattern.compile(Pattern.quote(searchQuery.trim()));
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
             Text priorText = new Text(content.substring(lastEnd, matcher.start()));
             Text matchedText = new Text(content.substring(matcher.start(), matcher.end()));
-            matchedText.setStyle("-fx-font-weight: bold; -fx-fill: red;");
+//            matchedText.setStyle("-fx-font-weight: bold; -fx-fill: green;");
             textFlow.getChildren().addAll(priorText, matchedText);
             lastEnd = matcher.end();
         }
-        textFlow.getChildren().add(new Text(content.substring(lastEnd)));
+        Text remainingText = new Text(content.substring(lastEnd));
+        // Apply a default style if needed
+        remainingText.setStyle("-fx-font-weight: normal; -fx-fill: black;");
+        textFlow.getChildren().add(remainingText);
         return textFlow;
     }
+
 
 
     private void showAlertWithTextFlow(String title, String header, TextFlow content) {
@@ -200,20 +204,26 @@ public class MainApp extends Application {
         String regexMatch = inputs[1];
         boolean found = false;
 
+        // Check if a word match is requested
         if (!wordMatch.isEmpty()) {
+            Pattern pattern = Pattern.compile("\\b" + Pattern.quote(wordMatch) + "\\b", Pattern.UNICODE_CHARACTER_CLASS);
             for (Item item : dataList) {
-                if (item.getText().equals(wordMatch)) {
-                    showMatchResult(item.getText(), "Word");
+                Matcher matcher = pattern.matcher(item.getText());
+                if (matcher.find()) {
+                    showAlert("Match Result", "Word match found.");
                     found = true;
                     break;
                 }
             }
-        } else if (!regexMatch.isEmpty()) {
+        }
+
+        // Check if a regex match is requested
+        if (!found && !regexMatch.isEmpty()) {
             Pattern pattern = Pattern.compile(regexMatch);
             for (Item item : dataList) {
                 Matcher matcher = pattern.matcher(item.getText());
                 if (matcher.find()) {
-                    showMatchResult(item.getText(), "Regular expression");
+                    showAlert("Match Result", "Regular expression match found.");
                     found = true;
                     break;
                 }
@@ -225,11 +235,7 @@ public class MainApp extends Application {
         }
     }
 
-    private void showMatchResult(String matchedText, String matchType) {
-        TextFlow textFlow = new TextFlow(new Text(matchedText));
-        textFlow.getChildren().get(0).setStyle("-fx-font-weight: bold; -fx-fill: red;");
-        showAlertWithTextFlow("Match Result", "Exact " + matchType + " match found:", textFlow);
-    }
+
 
     private void onUpdate() {
         Item selectedItem = tableView.getSelectionModel().getSelectedItem();
@@ -258,9 +264,28 @@ public class MainApp extends Application {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
-        alert.setContentText(content);
+
+        // Create a scrollable text area for the content
+        TextArea textArea = new TextArea(content);
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+
+        // Wrap the text area in a scroll pane
+        ScrollPane scrollPane = new ScrollPane(textArea);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setMaxWidth(Double.MAX_VALUE);
+        scrollPane.setMaxHeight(Double.MAX_VALUE);
+
+        // Set the scroll pane as the content of the alert
+        alert.getDialogPane().setContent(scrollPane);
+        alert.getDialogPane().setPrefSize(480, 320);  // Adjust size as needed
+
         alert.showAndWait();
     }
+
 
     public static void main(String[] args) {
         launch(args);
