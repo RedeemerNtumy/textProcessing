@@ -1,4 +1,6 @@
 package com.projects.text.textprocessing;
+import javafx.stage.FileChooser;
+
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -11,7 +13,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +36,12 @@ public class MainApp extends Application {
         tableView.getColumns().add(column);
 
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        ScrollPane scrollPane = new ScrollPane(tableView);
+        scrollPane.setFitToWidth(true);  // This will fit the table width to the scroll pane when resizing, remove if horizontal scroll is needed
+        scrollPane.setFitToHeight(true); // This will fit the table height to the scroll pane
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); // Horizontal scroll bar
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
         // Create buttons
         Button btnAdd = new Button("Add");
@@ -51,8 +63,12 @@ public class MainApp extends Application {
         Button btnMatch = new Button("Match");
         btnMatch.setOnAction(e -> onMatch());
 
+        Button btnUploadFile = new Button("Upload File");
+        btnUploadFile.setOnAction(e -> onUploadFile());
 
-        HBox buttonLayout = new HBox(10, btnSearch, btnUpdate, btnAdd, btnDelete, btnReplace, btnMatch);
+
+
+        HBox buttonLayout = new HBox(10, btnSearch, btnUpdate, btnAdd, btnDelete, btnReplace, btnMatch,btnUploadFile);
         VBox mainLayout = new VBox(10, tableView, buttonLayout);
         mainLayout.setStyle("-fx-background-color: #F6E6CB;");
         mainLayout.setPrefSize(800, 500);
@@ -81,6 +97,31 @@ public class MainApp extends Application {
             tableView.getItems().remove(selectedItem);
         }
     }
+
+    private void onUploadFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Text File");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
+        File file = fileChooser.showOpenDialog(null); // Use the current stage or provide your stage variable
+
+        if (file != null) {
+            try (Scanner scanner = new Scanner(file)) {
+                StringBuilder contentBuilder = new StringBuilder();
+                while (scanner.hasNextLine()) {
+                    String line = scanner.nextLine();
+                    contentBuilder.append(line).append("\n");
+                }
+                String content = contentBuilder.toString();
+                if (!content.isEmpty()) {
+                    dataList.add(new Item(content));
+                    tableView.getItems().setAll(dataList);
+                }
+            } catch (FileNotFoundException e) {
+                showAlert("File Error", "File not found: " + e.getMessage());
+            }
+        }
+    }
+
 
 
     private void onSearch() {
