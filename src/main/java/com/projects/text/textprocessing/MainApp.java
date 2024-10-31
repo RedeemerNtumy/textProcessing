@@ -1,7 +1,5 @@
 package com.projects.text.textprocessing;
 import javafx.stage.FileChooser;
-
-
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -37,9 +35,9 @@ public class MainApp extends Application {
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         ScrollPane scrollPane = new ScrollPane(tableView);
-        scrollPane.setFitToWidth(true);  // This will fit the table width to the scroll pane when resizing, remove if horizontal scroll is needed
-        scrollPane.setFitToHeight(true); // This will fit the table height to the scroll pane
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); // Horizontal scroll bar
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
         Button btnAdd = new Button("Add");
@@ -295,7 +293,6 @@ public class MainApp extends Application {
         alert.setTitle(title);
         alert.setHeaderText(null);
 
-        // Create a scrollable text area for the content
         TextArea textArea = new TextArea(content);
         textArea.setEditable(false);
         textArea.setWrapText(true);
