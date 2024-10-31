@@ -30,7 +30,6 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Initialize table columns
         TableColumn<Item, String> column = new TableColumn<>("Words");
         column.setCellValueFactory(new PropertyValueFactory<>("text"));
         tableView.getColumns().add(column);
