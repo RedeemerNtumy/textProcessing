@@ -42,7 +42,6 @@ public class MainApp extends Application {
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); // Horizontal scroll bar
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-        // Create buttons
         Button btnAdd = new Button("Add");
         btnAdd.setOnAction(e -> onAdd());
 
